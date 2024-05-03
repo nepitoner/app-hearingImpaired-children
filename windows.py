@@ -193,7 +193,8 @@ class RecordFrame(ctk.CTkFrame):
     def trim_audio(self):
         start_index = int(min(selected_points) * 1000)
         end_index = int(max(selected_points) * 1000)
-        i = len(Record.select().where(Record.person_id == self.master.person.id).execute()) + 14
+        # i = len(Record.select().where(Record.person_id == self.master.person.id).execute()) + 14
+        i = len(Record.select().execute()) + 14
         self.chosen_file = 'resources/H' + str(self.master.person.id) + '-' + str(i + 1) + '-trimmed.wav'
         audio_file = AudioSegment.from_file(self.audio_path)
         trimmed_audio = audio_file[start_index:end_index]
