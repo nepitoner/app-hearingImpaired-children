@@ -64,7 +64,7 @@ class App(ctk.CTk):
 
     def init(self):
         Person.create_table()
-        coldata = ["ID", "Имя", "Фамилия", "Пол", "Возрастная категория"]
+        coldata = ["ID", "Имя", "Фамилия", "Возрастная категория"]
         self.table = Tableview(master=self, coldata=coldata, rowdata=self.update_table(), searchable=True)
         self.create_button = ctk.CTkButton(self, text="Создать", command=self.create_callbck)
         self.delete_button = ctk.CTkButton(self, text="Удалить", command=self.delete_callbck)
@@ -161,8 +161,6 @@ class ProfileFrame(ctk.CTkFrame):
         self.label11.grid(row=0, column=1)
         self.label2.grid(row=1, column=0, padx=20)
         self.label22.grid(row=1, column=1)
-        self.label3.grid(row=2, column=0, padx=20)
-        self.label33.grid(row=2, column=1)
         self.label4.grid(row=3, column=0, padx=20)
         self.label44.grid(row=3, column=1)
 
@@ -195,8 +193,7 @@ class RecordFrame(ctk.CTkFrame):
     def trim_audio(self):
         start_index = int(min(selected_points) * 1000)
         end_index = int(max(selected_points) * 1000)
-
-        i = len(Record.select().where(Record.person_id == self.master.person.id).execute())
+        i = len(Record.select().where(Record.person_id == self.master.person.id).execute()) + 14
         self.chosen_file = 'resources/H' + str(self.master.person.id) + '-' + str(i + 1) + '-trimmed.wav'
         audio_file = AudioSegment.from_file(self.audio_path)
         trimmed_audio = audio_file[start_index:end_index]
@@ -346,32 +343,14 @@ class ImageWork:
         category_id = person.category_id
         records = list(Record.select().where(Record.person_id == person_id).execute())
         ref = list(ReferenceValues.select().where(ReferenceValues.category_id == category_id).execute())
-        if len(records) == 1:
-            rec1, rec2 = records[0], ref[0]
-            dif_f0 = rec2.F0 - rec1.F0
-            dif_std = rec2.std_F - rec1.std_F
-            dif_j = rec2.Jloc - rec1.Jloc
-            dif_s = rec2.Sloc - rec1.Sloc
 
-            dist = pow(
-                pow(dif_f0, 2) + pow(dif_std, 2) + pow(dif_j, 2) + pow(dif_s, 2),
-                0.5)
-            self.adjust_saturation(dist / 1000, person_id, records[-1].id)
-        else:
-            rec1, rec2 = records[-2], records[-1]
-            ref = ref[0]
+        rec1, rec2 = records[-1], ref[0]
+        dif_f0 = rec2.F0 - rec1.F0
+        dif_std = rec2.std_F - rec1.std_F
+        dif_j = rec2.Jloc - rec1.Jloc
+        dif_s = rec2.Sloc - rec1.Sloc
 
-            dif1_f0 = ref.F0 - rec1.F0
-            dif1_std = ref.std_F - rec1.std_F
-            dif1_j = ref.Jloc - rec1.Jloc
-            dif1_s = ref.Sloc - rec1.Sloc
-
-            dif2_f0 = rec2.F0 - ref.F0
-            dif2_std = rec2.std_F - ref.std_F
-            dif2_j = rec2.Jloc - ref.Jloc
-            dif2_s = rec2.Sloc - ref.Sloc
-
-            dist1 = pow(pow(dif1_f0, 2) + pow(dif1_std, 2) + pow(dif1_j, 2) + pow(dif1_s, 2), 0.5)
-            dist2 = pow(pow(dif2_f0, 2) + pow(dif2_std, 2) + pow(dif2_j, 2) + pow(dif2_s, 2), 0.5)
-            res_dist = dist2 - dist1
-            self.adjust_saturation(res_dist / 1000, person_id, records[-1].id)
+        dist = pow(
+            pow(dif_f0, 2) + pow(dif_std, 2) + pow(dif_j, 2) + pow(dif_s, 2),
+            0.5)
+        self.adjust_saturation(dist / 1000, person_id, records[-1].id)
