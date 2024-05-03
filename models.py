@@ -15,7 +15,6 @@ class Person(Model):
     id = AutoField()
     name = CharField()
     surname = CharField()
-    sex = IntegerField()
 
     category_id = ForeignKeyField(AgeCategories, backref='persons')
 
@@ -40,7 +39,6 @@ class Record(Model):
 
 class ReferenceValues(Model):
     category_id = ForeignKeyField(AgeCategories, backref='ref_values')
-    sex = IntegerField(primary_key=True)
 
     F0 = FloatField()
     std_F = FloatField()

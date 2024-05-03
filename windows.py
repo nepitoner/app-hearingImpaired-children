@@ -33,7 +33,7 @@ class App(ctk.CTk):
         self.pack()
 
     def update_table(self):
-        return [[person.id, person.name, person.surname, person.sex, person.category_id] for person in
+        return [[person.id, person.name, person.surname, person.category_id] for person in
                 list(Person.select().execute())]
 
     def create_callbck(self):
@@ -97,9 +97,7 @@ class Popup(ctk.CTkToplevel):
         super().__init__(*args, **kwargs)
         self.cancel_button = None
         self.save_button = None
-        self.sex_entry_label = None
         self.surname_entry_label = None
-        self.sex_entry = None
         self.surname_entry = None
         self.name_entry_label = None
         self.name_entry = None
@@ -107,7 +105,6 @@ class Popup(ctk.CTkToplevel):
         self.category_id_entry = None
         self.name = tb.StringVar(value="")
         self.surname = tb.StringVar(value="")
-        self.sex = tb.StringVar(value="")
         self.category_id = tb.StringVar(value="")
         self.parent = parent
         x = parent.winfo_x() + parent.winfo_width() // 2 - parent.winfo_width() // 2
@@ -123,8 +120,6 @@ class Popup(ctk.CTkToplevel):
         self.name_entry_label = ctk.CTkLabel(self, text="Имя")
         self.surname_entry = ctk.CTkEntry(self, textvariable=self.surname)
         self.surname_entry_label = ctk.CTkLabel(self, text="Фамилия")
-        self.sex_entry = ctk.CTkEntry(self, textvariable=self.sex)
-        self.sex_entry_label = ctk.CTkLabel(self, text="Пол")
         self.category_id_entry = ctk.CTkEntry(self, textvariable=self.category_id)
         self.category_id_entry_label = ctk.CTkLabel(self, text="Возрастная категория")
         self.save_button = ctk.CTkButton(self, text="Создать", command=self.save_user)
@@ -135,19 +130,15 @@ class Popup(ctk.CTkToplevel):
         self.name_entry_label.grid(row=1, column=1)
         self.surname_entry.grid(row=2, column=2, pady=10, padx=10)
         self.surname_entry_label.grid(row=2, column=1)
-        self.sex_entry.grid(row=3, column=2, pady=10, padx=10)
-        self.sex_entry_label.grid(row=3, column=1)
         self.category_id_entry.grid(row=4, column=2, pady=10, padx=10)
         self.category_id_entry_label.grid(row=4, column=1)
         self.save_button.grid(row=5, column=1, sticky="E")
         self.cancel_button.grid(row=5, column=2, pady=10)
 
     def save_user(self):
-        person = Person(name=self.name.get(), surname=self.surname.get(),
-                        sex=int(self.sex.get()), category_id=int(self.category_id.get()))
+        person = Person(name=self.name.get(), surname=self.surname.get(), category_id=int(self.category_id.get()))
         person.save()
-        self.parent.table.insert_row("end", values=[person.id, person.name, person.surname,
-                                                    person.sex, person.category_id])
+        self.parent.table.insert_row("end", values=[person.id, person.name, person.surname, person.category_id])
         self.parent.update()
         self.destroy()
 
@@ -163,8 +154,6 @@ class ProfileFrame(ctk.CTkFrame):
         self.label11 = ctk.CTkLabel(self, text=self.master.person.name, anchor="w")
         self.label2 = ctk.CTkLabel(self, text="Фамилия", anchor="w")
         self.label22 = ctk.CTkLabel(self, text=self.master.person.surname, anchor="w")
-        self.label3 = ctk.CTkLabel(self, text="Пол", anchor="w")
-        self.label33 = ctk.CTkLabel(self, text=self.master.person.sex, anchor="w")
         self.label4 = ctk.CTkLabel(self, text="Возрастная категория", anchor="w")
         self.label44 = ctk.CTkLabel(self, text=self.master.person.category_id, anchor="w")
 
@@ -355,10 +344,8 @@ class ImageWork:
     def count_progress(self, person_id):
         person = Person.select().where(Person.id == person_id).execute()[0]
         category_id = person.category_id
-        sex = person.sex
         records = list(Record.select().where(Record.person_id == person_id).execute())
-        ref = list(ReferenceValues.select().where(ReferenceValues.category_id == category_id and
-                                                  ReferenceValues.sex == sex).execute())
+        ref = list(ReferenceValues.select().where(ReferenceValues.category_id == category_id).execute())
         if len(records) == 1:
             rec1, rec2 = records[0], ref[0]
             dif_f0 = rec2.F0 - rec1.F0
