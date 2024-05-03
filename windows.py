@@ -239,10 +239,10 @@ class RecordFrame(ctk.CTkFrame):
             with open(self.chosen_file, "rb") as fh:
                 buf = io.BytesIO(fh.read())
 
-            F0, std_F, Jloc, Sloc, MPT, L = calc_params(self.chosen_file)
+            F0, std_F, Jloc, Sloc = calc_params(self.chosen_file)
             record = Record(person_id=self.master.person.id, create_date=datetime.now(),
                             record=buf.getvalue(), info="",
-                            F0=F0, std_F=std_F, Jloc=Jloc, Sloc=Sloc, MPT=MPT, L=L)
+                            F0=F0, std_F=std_F, Jloc=Jloc, Sloc=Sloc)
             record.save()
             iw = ImageWork("resources/initial_image.png")
             iw.count_progress(record.person_id)
@@ -319,10 +319,6 @@ class ShowRecord(ctk.CTkToplevel):
         self.label33 = ctk.CTkLabel(self, text=self.record.Jloc, anchor="w")
         self.label4 = ctk.CTkLabel(self, text="Шиммер", anchor="w")
         self.label44 = ctk.CTkLabel(self, text=self.record.Sloc, anchor="w")
-        self.label5 = ctk.CTkLabel(self, text="ВМФ, с", anchor="w")
-        self.label55 = ctk.CTkLabel(self, text=self.record.MPT, anchor="w")
-        self.label6 = ctk.CTkLabel(self, text="Сила звучания(громкость), дБ", anchor="w")
-        self.label66 = ctk.CTkLabel(self, text=self.record.L, anchor="w")
 
     def pack(self):
         self.label1.grid(row=0, column=0, padx=20)
@@ -333,10 +329,6 @@ class ShowRecord(ctk.CTkToplevel):
         self.label33.grid(row=2, column=1, padx=20)
         self.label4.grid(row=3, column=0, padx=20)
         self.label44.grid(row=3, column=1, padx=20)
-        self.label5.grid(row=4, column=0, padx=20)
-        self.label55.grid(row=4, column=1, padx=20)
-        self.label6.grid(row=5, column=0, padx=20)
-        self.label66.grid(row=5, column=1, padx=20)
 
     def show_image(self):
         image = Image.open("resources/progress_image_" + str(self.person_id) + "_"
@@ -373,10 +365,9 @@ class ImageWork:
             dif_std = rec2.std_F - rec1.std_F
             dif_j = rec2.Jloc - rec1.Jloc
             dif_s = rec2.Sloc - rec1.Sloc
-            dif_mpt = rec2.MPT - rec1.MPT
-            dif_l = rec2.L - rec1.L
+
             dist = pow(
-                pow(dif_f0, 2) + pow(dif_std, 2) + pow(dif_j, 2) + pow(dif_s, 2) + pow(dif_mpt, 2) + pow(dif_l, 2),
+                pow(dif_f0, 2) + pow(dif_std, 2) + pow(dif_j, 2) + pow(dif_s, 2),
                 0.5)
             self.adjust_saturation(dist / 1000, person_id, records[-1].id)
         else:
@@ -387,19 +378,13 @@ class ImageWork:
             dif1_std = ref.std_F - rec1.std_F
             dif1_j = ref.Jloc - rec1.Jloc
             dif1_s = ref.Sloc - rec1.Sloc
-            dif1_mpt = ref.MPT - rec1.MPT
-            dif1_l = ref.L - rec1.L
 
             dif2_f0 = rec2.F0 - ref.F0
             dif2_std = rec2.std_F - ref.std_F
             dif2_j = rec2.Jloc - ref.Jloc
             dif2_s = rec2.Sloc - ref.Sloc
-            dif2_mpt = rec2.MPT - ref.MPT
-            dif2_l = rec2.L - ref.L
 
-            dist1 = pow(pow(dif1_f0, 2) + pow(dif1_std, 2) + pow(dif1_j, 2) + pow(dif1_s, 2) + pow(dif1_mpt, 2)
-                        + pow(dif1_l, 2), 0.5)
-            dist2 = pow(pow(dif2_f0, 2) + pow(dif2_std, 2) + pow(dif2_j, 2) + pow(dif2_s, 2) + pow(dif2_mpt, 2)
-                        + pow(dif2_l, 2), 0.5)
+            dist1 = pow(pow(dif1_f0, 2) + pow(dif1_std, 2) + pow(dif1_j, 2) + pow(dif1_s, 2), 0.5)
+            dist2 = pow(pow(dif2_f0, 2) + pow(dif2_std, 2) + pow(dif2_j, 2) + pow(dif2_s, 2), 0.5)
             res_dist = dist2 - dist1
             self.adjust_saturation(res_dist / 1000, person_id, records[-1].id)

@@ -85,8 +85,7 @@ def calc_params(filename):
 	T = None
 	N = None
 	full_A = None
-	MPT = data[~np.isclose(data,0)].size/fs
-	L=20*np.log10(np.max(np.abs(data)))
+
 	spectrum_A = np.abs(np.fft.fft(data))
 	Formants = np.zeros(6)
 	Formants[0] = F0
@@ -110,10 +109,9 @@ def calc_params(filename):
 	std_F = round(std_F, ndigits=3)
 	Jloc = round(Jloc,ndigits=3)
 	Sloc = round(Sloc, ndigits=3)
-	MPT = round(MPT, ndigits=3)
-	L = round(L, ndigits=3)
+
 	for i in range(6):
 		Formants[i] = round(Formants[i], ndigits=3)
 
-	return F0, std_F,Jloc, Sloc, MPT, L
+	return F0, std_F,Jloc, Sloc
 

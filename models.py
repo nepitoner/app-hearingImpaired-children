@@ -33,8 +33,6 @@ class Record(Model):
     std_F = FloatField()
     Jloc = FloatField()
     Sloc = FloatField()
-    MPT = FloatField()
-    L = FloatField()
 
     class Meta:
         database = SqliteDatabase('new_voice.db')
@@ -48,8 +46,6 @@ class ReferenceValues(Model):
     std_F = FloatField()
     Jloc = FloatField()
     Sloc = FloatField()
-    MPT = FloatField()
-    L = FloatField()
 
     class Meta:
         table_name = "reference_values"
